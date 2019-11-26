@@ -8,7 +8,7 @@ class StockContainer extends Component {
       <div>
         <h2>Stocks</h2>
         {
-          //render the list of stocks here
+          this.props.allStocks.map(stock => <Stock stock={stock} addStockToPortfolio={this.props.addStockToPortfolio} />)
         }
       </div>
     );
@@ -17,3 +17,6 @@ class StockContainer extends Component {
 }
 
 export default StockContainer;
+
+
+
