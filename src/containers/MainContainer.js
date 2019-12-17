@@ -3,7 +3,7 @@ import StockContainer from './StockContainer'
 import PortfolioContainer from './PortfolioContainer'
 import SearchBar from '../components/SearchBar'
 
-const STOCKS_URL = 'http://localhost:3000/stocks';
+const API = 'http://localhost:3000/stocks';
 
 class MainContainer extends Component {
 
@@ -14,8 +14,8 @@ class MainContainer extends Component {
     sortedStocks: []
   }
 
-  componentDidMount() {
-    fetch(STOCKS_URL)
+  getStocks = () => {
+    fetch(API)
     .then(res => res.json())
     .then(stocksData => {
       this.setState({
@@ -24,20 +24,26 @@ class MainContainer extends Component {
       })
     })
   }
-
-  addStockToPortfolio = (stock) => {
-    this.setState({
-      portfolioStocks: [...this.state.portfolioStocks, stock]
-    })
+  componentDidMount() {
+    this.getStocks();
   }
 
-  deleteStockFromPortfolio = (stock) => {
+  addStockToPortfolio = stock => {
+    const match = this.state.portfolioStocks.find(a => a.id === stock.id)
+    if (!match){
+      this.setState({
+      portfolioStocks: [...this.state.portfolioStocks, stock]
+      })
+    } 
+  }
+
+  deleteStockFromPortfolio = stock => {
     this.setState({
       portfolioStocks: this.state.portfolioStocks.filter(portfolio => portfolio !== stock)
     })
   }
 
-  filterStocks = (filterType) => {
+  filterStocks = filterType => {
     filterType
     ? this.setState({
       filteredStocks: this.state.allStocks.filter(chosenStocks => chosenStocks.type === filterType )
@@ -47,7 +53,7 @@ class MainContainer extends Component {
     })
   }
 
-  sortStocks = (sortType) => {
+  sortStocks = sortType => {
     if (sortType === "Alphabetically") {
       this.setState({
         sortedStocks: this.state.allStocks.sort((a, b) => {
@@ -71,20 +77,17 @@ class MainContainer extends Component {
   }
 
   render() {
+    const {filterStocks, sortStocks, addStockToPortfolio, deleteStockFromPortfolio} = this;
+    const {portfolioStocks } = this.state;
     return (
       <div>
-        <SearchBar filterStocks={this.filterStocks} sortStocks={this.sortStocks} />
-
+        <SearchBar filterStocks={filterStocks} sortStocks={sortStocks} />
           <div className="row">
             <div className="col-8">
-
-              <StockContainer addStockToPortfolio={this.addStockToPortfolio} allStocks={this.state.filteredStocks} />
-
+              <StockContainer addStockToPortfolio={addStockToPortfolio} allStocks={this.state.filteredStocks} />
             </div>
             <div className="col-4">
-
-              <PortfolioContainer portfolioStocks={this.state.portfolioStocks} deleteStockFromPortfolio={this.deleteStockFromPortfolio} />
-
+              <PortfolioContainer portfolioStocks={portfolioStocks} deleteStockFromPortfolio={deleteStockFromPortfolio} />
             </div>
           </div>
       </div>
